@@ -1,0 +1,56 @@
+# docker-compose.yml
+version: "3.8"
+services:
+  nginx:
+    container_name: nginx-2
+    build: ./docker/nginx
+    command: nginx -g "daemon off;"
+    links:
+      - php
+    ports:
+      - "80:80"
+    volumes:
+      -  ./logs/nginx:/var/log/nginx
+      - ./src:/var/www/html
+  php:
+    container_name: php-2
+    build: ./docker/php
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./src:/var/www/html
+    working_dir: /var/www/html
+  mysql:
+    image: mysql
+    container_name: mysql-2
+    # NOTE: use of "mysql_native_password" is not recommended: https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html#upgrade-caching-sha2-password
+    # (this is just an example, not intended to be a production configuration)
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      #MYSQL_ROOT_PASSWORD: example
+      #MYSQL_ALLOW_EMPTY_PASSWORD: yes
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: helloworld
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+
+  # adminer:
+  #   image: adminer:4.6.2
+  #   container_name: adminer-1
+  #   restart: always
+  #   ports:
+  #     - 8082:8080
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: pma-2
+    links:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    restart: always
+    ports:
+      - 8085:80

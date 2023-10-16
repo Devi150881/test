@@ -1,0 +1,9 @@
+############ Build Stage ############
+# This stage compiles and builds OpenResty with Lua support
+# Installs dependencies, makes OpenRestry
+FROM nginx
+ADD helloworld.nginx.conf /etc/nginx/conf.d/default.conf
+COPY sql.php /var/www/html
+CMD ["nginx", "-g","daemon off;"]
+
+
